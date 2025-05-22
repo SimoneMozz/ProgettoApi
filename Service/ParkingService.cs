@@ -47,7 +47,7 @@ namespace ProgettoApi.Service
 
             if (record != null)
             {
-                record.Count++; // Incrementa il numero di irregolarità
+                record.Count++;
             }
             else
             {
