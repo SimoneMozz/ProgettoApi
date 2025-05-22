@@ -61,11 +61,6 @@ namespace ProgettoApi.Service
             return _irregularities;
         }
 
-        public int Count()
-        {
-            throw new NotImplementedException();
-        }
-
         void IParkingService.RecordIrregularity(string plate)
         {
             RecordIrregularity(plate);
