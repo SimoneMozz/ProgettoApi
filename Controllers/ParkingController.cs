@@ -8,7 +8,7 @@ namespace ProgettoApi.Controllers
     [Route("parking")]
     public class ParkingController : ControllerBase
     {
-        //ciao ciccio
+        //ciao ciccio prova
         private readonly ParkingService _service = new ParkingService();
 
         [HttpPost("in")]
@@ -25,7 +25,7 @@ namespace ProgettoApi.Controllers
             return Ok(result);
         }
 
-        [HttpGet("irregolari")]
+        [HttpGet("irregolari")]//ads
         public IActionResult GetIrregolari()
         {
             var result = _service.ShowIrregularities();

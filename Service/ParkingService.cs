@@ -4,8 +4,14 @@ namespace ProgettoApi.Service
 {
     public class ParkingService
     {
-        private Dictionary<string, DateTime> _activeParkings = new Dictionary<string, DateTime>();
-        private List<IrregularityRecord> _irregularities = new List<IrregularityRecord>();
+        private Dictionary<string, DateTime> _activeParkings;
+        private List<IrregularityRecord> _irregularities;
+
+        public void Start()
+        {
+            _activeParkings = new Dictionary<string, DateTime>();
+            _irregularities = new List<IrregularityRecord>();
+        }
 
         public string Entry(InputDati input)
         {
