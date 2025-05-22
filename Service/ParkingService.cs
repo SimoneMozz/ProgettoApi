@@ -3,37 +3,30 @@ using System;
 
 namespace ProgettoApi.Service
 {
-    public class ParkingService
+    public class ParkingService : IParkingService
     {
-        private List<OutputDati> _irregolari = new List<OutputDati>();
-        private List<InputDatiTest> cliente = new List<InputDatiTest>();
+        private List<ParkingRecord> _activeParkings;
+        private List<IrregularityRecord> _irregularities;
 
-        public string Entry(ProgettoApi.models.InputDatiTest input)
+        public ParkingService()
         {
-            try
-            {
-                // Verifica Targa
-                if ((string.IsNullOrWhiteSpace(input.Plate) || input.Data == null) || (string.IsNullOrWhiteSpace(input.Plate) && input.Data == null))
-                {
-                    throw new ArgumentException("La targa può essere nulla e/o la data può essere non valida");
-                }
+            _activeParkings = new List<ParkingRecord>();
+            _irregularities = new List<IrregularityRecord>();
+        }
 
-                // Se tutto va bene
-                Console.WriteLine("Targa valida!");
-                cliente.Add(input);
-                return "ENTRATO";
-            }
-            catch (Exception ex)
-            {
-                return "Si è verificato un errore: " + ex.Message + ". L'accesso è stato negato.";
-            }
+        public string Entry(InputDati input)
+        {
+            _activeParkings.Add(new ParkingRecord { Plate = input.Plate, EntryTime = input.Data });
+            return $"{input.Plate} è entrato nel parcheggio alle {input.Data}.";
+        }
 
         }
 
         [HttpPost]
         public IActionResult Exit([FromBody] OutputDati output)
         {
-            try
+            var record = _activeParkings.FirstOrDefault(r => r.Plate == input.Plate);
+            if (record == null)
             {
                 if (string.IsNullOrWhiteSpace(output.PlateO))
                 {
@@ -47,36 +40,46 @@ namespace ProgettoApi.Service
                         try
                         {
 
-                            if (output.DataO < cliente.Data)
-                            {
-                                throw new ArgumentException("L'orario di uscita non può essere precedente all'orario di entrata.");
-                            }else
-                            {
-                                TimeSpan durata = output.DataO - cliente.Data;
-                                if (durata.TotalHours > 2)
-                                {
-                                    _irregolari.Add(output.Plate0);
-                                    _irregolari.Add(output.DataO);
-                                    output.contatore = contatore + 1;
-                                    _irregolari.Add(output.contatore);
-                                }
-                            }
-                        }
-                        catch (ArgumentException ex)
-                        {
-                            Console.WriteLine("Errore di validazione: " + ex.Message);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine("Errore imprevisto: " + ex.Message);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
+            TimeSpan duration = input.Data - record.EntryTime;
+            _activeParkings.Remove(record);
+
+            if (duration.TotalHours > 2)
             {
-                Console.WriteLine("Errore generale: " + ex.Message);
+                RecordIrregularity(input.Plate);
+                return $"{input.Plate} ha lasciato il parcheggio con un'irregolarità. Tempo totale: {duration.TotalMinutes} minuti.";
             }
+
+            return $"{input.Plate} ha lasciato il parcheggio senza irregolarità.";
+        }
+
+        private void RecordIrregularity(string plate)
+        {
+            DateTime today = DateTime.Today;
+            var record = _irregularities.FirstOrDefault(r => r.Plate == plate && r.Date.Date == today);
+
+            if (record != null)
+            {
+                record.Count++;
+            }
+            else
+            {
+                _irregularities.Add(new IrregularityRecord { Plate = plate, Date = today, Count = 1 });
+            }
+        }
+
+        public List<IrregularityRecord> ShowIrregularities()
+        {
+            return _irregularities;
+        }
+
+        public int Count()
+        {
+            throw new NotImplementedException();
+        }
+
+        void IParkingService.RecordIrregularity(string plate)
+        {
+            RecordIrregularity(plate);
         }
     }
 }
