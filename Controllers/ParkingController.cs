@@ -35,6 +35,5 @@ namespace ProgettoApi.Controllers
             int totalIrregularities = result.Count; 
             return Ok(new { TotaleIrregolarità = totalIrregularities, Dettagli = result });
         }
-
     }
 }

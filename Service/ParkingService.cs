@@ -5,43 +5,23 @@ namespace ProgettoApi.Service
 {
     public class ParkingService : IParkingService
     {
-        private List<ParkingRecord> _activeParkings = new List<ParkingRecord>();
-        private List<IrregularityRecord> _irregularities = new List<IrregularityRecord>();
+        private List<ParkingRecord> _activeParkings;
+        private List<IrregularityRecord> _irregularities;
 
-        
+        public ParkingService()
+        {
+            _activeParkings = new List<ParkingRecord>();
+            _irregularities = new List<IrregularityRecord>();
+        }
 
         public string Entry(InputDati input)
         {
-            try
-            {
-                // Verifica Targa
-                if (string.IsNullOrWhiteSpace(input.Plate))
-                {
-                   throw new ArgumentException("La targa è nulla o vuota.");
-                }
-
-                // Verifica Data
-                if (input.Data == null)
-                {
-                    throw new ArgumentException("La data non è valida o è nulla.");
-                }
-
-                // Se tutto va bene
-                return "Il veicolo con targa " + input.Plate + " può entrare, orario di ingresso: " + input.Data;
-            }
-            catch (ArgumentException ex)
-            {
-                return "Errore di input: " + ex.Message;
-            }
-            catch (Exception ex)
-            {
-                return "Errore imprevisto: " + ex.Message;
-            }
+            _activeParkings.Add(new ParkingRecord { Plate = input.Plate, EntryTime = input.Data });
+            return $"{input.Plate} è entrato nel parcheggio alle {input.Data}.";
         }
 
         public string Exit(InputDati input)
         {
-            //da spiegare 
             var record = _activeParkings.FirstOrDefault(r => r.Plate == input.Plate);
             if (record == null)
             {
@@ -67,7 +47,7 @@ namespace ProgettoApi.Service
 
             if (record != null)
             {
-                record.Count++;
+                record.Count++; // Incrementa il numero di irregolarità
             }
             else
             {
