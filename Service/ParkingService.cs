@@ -2,7 +2,7 @@
 
 namespace ProgettoApi.Service
 {
-    public class ParkingService
+    public class ParkingService : IParkingService
     {
         private Dictionary<string, DateTime> _activeParkings;
         private List<IrregularityRecord> _irregularities;
@@ -56,6 +56,16 @@ namespace ProgettoApi.Service
         public List<IrregularityRecord> ShowIrregularities()
         {
             return _irregularities;
+        }
+
+        public int Count()
+        {
+            throw new NotImplementedException();
+        }
+
+        void IParkingService.RecordIrregularity(string plate)
+        {
+            RecordIrregularity(plate);
         }
     }
 }
