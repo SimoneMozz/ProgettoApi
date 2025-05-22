@@ -22,6 +22,7 @@ namespace ProgettoApi.Service
 
         public string Exit(InputDati input)
         {
+            //da spiegare 
             var record = _activeParkings.FirstOrDefault(r => r.Plate == input.Plate);
             if (record == null)
             {
