@@ -8,33 +8,37 @@ namespace ProgettoApi.Controllers
     [Route("parking")]
     public class ParkingController : ControllerBase
     {
-        private IParkingService _service;
-        public ParkingController(IParkingService parkingService)
+        private readonly ParkingService service = new ParkingService();
+
+        [HttpPost()]
+        public string GetTest(Parkingin parkingin)
         {
-            _service = parkingService;
+            var now = DateTime.Today.Date;
+
+
+            if (parkingin.Ingresso.Date < now)
+            {
+                return $"La data {parkingin.Ingresso} è passata";
+            }
+            else if (parkingin.Ingresso.Date > now)
+            {
+                return $"La data {parkingin.Ingresso} è futura";
+            }
+            else
+            {
+                return $"La data {parkingin.Ingresso} è presente";
+            }
         }
 
         [HttpPost("in")]
-        public IActionResult Ingresso([FromBody] InputDati input)
+        public string Ingresso(InputDatiTest input)
         {
-            var result = _service.Entry(input);
-            return Ok(result);
+            return service.Entry(input);
         }
 
         [HttpPost("out")]
-        public IActionResult Uscita([FromBody] InputDati input)
-        {
-            var result = _service.Exit(input);
-            return Ok(result);
-        }
 
-        [HttpGet("irregolari")]//ads
-        public IActionResult GetIrregolari()
-        {
-            var result = _service.ShowIrregularities();
-            int totalIrregularities = result.Count; 
-            return Ok(new { TotaleIrregolarità = totalIrregularities, Dettagli = result });
-        }
+        [HttpGet("irregolari")]
 
     }
 }

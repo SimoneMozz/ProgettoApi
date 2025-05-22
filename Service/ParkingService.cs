@@ -1,71 +1,82 @@
 ﻿using ProgettoApi.models;
+using System;
 
 namespace ProgettoApi.Service
 {
-    public class ParkingService : IParkingService
+    public class ParkingService
     {
-        private Dictionary<string, DateTime> _activeParkings;
-        private List<IrregularityRecord> _irregularities;
+        private List<OutputDati> _irregolari = new List<OutputDati>();
+        private List<InputDatiTest> cliente = new List<InputDatiTest>();
 
-        public ParkingService()
+        public string Entry(ProgettoApi.models.InputDatiTest input)
         {
-            _activeParkings = new Dictionary<string, DateTime>();
-            _irregularities = new List<IrregularityRecord>();
-        }
-
-        public string Entry(InputDati input)
-        {
-            _activeParkings[input.Plate] = input.Data;
-            return $"{input.Plate} è entrato nel parcheggio alle {input.Data}.";
-        }
-
-        public string Exit(InputDati input)
-        {
-            if (!_activeParkings.ContainsKey(input.Plate))
+            try
             {
-                return $"{input.Plate} non risulta parcheggiato.";
+                // Verifica Targa
+                if ((string.IsNullOrWhiteSpace(input.Plate) || input.Data == null) || (string.IsNullOrWhiteSpace(input.Plate) && input.Data == null))
+                {
+                    throw new ArgumentException("La targa può essere nulla e/o la data può essere non valida");
+                }
+
+                // Se tutto va bene
+                Console.WriteLine("Targa valida!");
+                cliente.Add(input);
+                return "ENTRATO";
+            }
+            catch (Exception ex)
+            {
+                return "Si è verificato un errore: " + ex.Message + ". L'accesso è stato negato.";
             }
 
-            DateTime entryTime = _activeParkings[input.Plate];
-            _activeParkings.Remove(input.Plate);
+        }
 
-            TimeSpan duration = input.Data - entryTime;
-
-            if (duration.TotalHours > 2)
+        [HttpPost]
+        public IActionResult Exit([FromBody] OutputDati output)
+        {
+            try
             {
-                RecordIrregularity(input.Plate);
-                return $"{input.Plate} ha lasciato il parcheggio con un'irregolarità. Tempo totale: {duration.TotalMinutes} minuti.";
+                if (string.IsNullOrWhiteSpace(output.PlateO))
+                {
+                    throw new ArgumentException("La targa non può essere vuota.");
+                }
+                Console.WriteLine("Targa valida! Adesso verificherò che la targa sia presente nel registro degli ingressi e ti farò sapere.");
+                foreach (var a in cliente)
+                {
+                    if (output.PlateO == cliente.Plate)
+                    {
+                        try
+                        {
+
+                            if (output.DataO < cliente.Data)
+                            {
+                                throw new ArgumentException("L'orario di uscita non può essere precedente all'orario di entrata.");
+                            }else
+                            {
+                                TimeSpan durata = output.DataO - cliente.Data;
+                                if (durata.TotalHours > 2)
+                                {
+                                    _irregolari.Add(output.Plate0);
+                                    _irregolari.Add(output.DataO);
+                                    output.contatore = contatore + 1;
+                                    _irregolari.Add(output.contatore);
+                                }
+                            }
+                        }
+                        catch (ArgumentException ex)
+                        {
+                            Console.WriteLine("Errore di validazione: " + ex.Message);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Errore imprevisto: " + ex.Message);
+                        }
+                    }
+                }
             }
-
-            return $"{input.Plate} ha lasciato il parcheggio.";
-        }
-
-        private void RecordIrregularity(string plate)
-        {
-            DateTime today = DateTime.Today;
-            var record = _irregularities.FirstOrDefault(r => r.Plate == plate && r.Date.Date == today);
-            if (record != null)
+            catch (Exception ex)
             {
-                record.Count++;
+                Console.WriteLine("Errore generale: " + ex.Message);
             }
-            else
-            {
-                _irregularities.Add(new IrregularityRecord { Plate = plate, Date = today, Count = 1 });
-            }
-        }
-        public List<IrregularityRecord> ShowIrregularities()
-        {
-            return _irregularities;
-        }
-
-        public int Count()
-        {
-            throw new NotImplementedException();
-        }
-
-        void IParkingService.RecordIrregularity(string plate)
-        {
-            RecordIrregularity(plate);
         }
     }
 }
