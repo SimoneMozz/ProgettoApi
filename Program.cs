@@ -1,3 +1,5 @@
+using ProgettoApi.Service;
+
 namespace ProgettoApi
 {
     public class Program
@@ -12,6 +14,8 @@ namespace ProgettoApi
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddSingleton<IParkingService, ParkingService>();
 
             var app = builder.Build();
 

@@ -2,10 +2,16 @@
 
 namespace ProgettoApi.Service
 {
-    public class ParkingService
+    public class ParkingService : IParkingService
     {
-        private Dictionary<string, DateTime> _activeParkings = new Dictionary<string, DateTime>();
-        private List<IrregularityRecord> _irregularities = new List<IrregularityRecord>();
+        private Dictionary<string, DateTime> _activeParkings;
+        private List<IrregularityRecord> _irregularities;
+
+        public ParkingService()
+        {
+            _activeParkings = new Dictionary<string, DateTime>();
+            _irregularities = new List<IrregularityRecord>();
+        }
 
         public string Entry(InputDati input)
         {
@@ -50,6 +56,16 @@ namespace ProgettoApi.Service
         public List<IrregularityRecord> ShowIrregularities()
         {
             return _irregularities;
+        }
+
+        public int Count()
+        {
+            throw new NotImplementedException();
+        }
+
+        void IParkingService.RecordIrregularity(string plate)
+        {
+            RecordIrregularity(plate);
         }
     }
 }

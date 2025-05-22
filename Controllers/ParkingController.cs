@@ -8,9 +8,11 @@ namespace ProgettoApi.Controllers
     [Route("parking")]
     public class ParkingController : ControllerBase
     {
-        //ciao ciccio
-        //Sono sul branch di simone
-        private readonly ParkingService _service = new ParkingService();
+        private IParkingService _service;
+        public ParkingController(IParkingService parkingService)
+        {
+            _service = parkingService;
+        }
 
         [HttpPost("in")]
         public IActionResult Ingresso([FromBody] InputDati input)
