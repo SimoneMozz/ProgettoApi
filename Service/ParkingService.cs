@@ -4,12 +4,12 @@ namespace ProgettoApi.Service
 {
     public class ParkingService : IParkingService
     {
-        private readonly List<ParkingRecord> _activeParkings;
-        private readonly List<IrregularityRecord> _irregularities;
+        private List<ParkingRecord> _activeParkings;
+        private List<IrregularityRecord> _irregularities;
 
         public void Start()
         {
-            _activeParkings = new Dictionary<string, DateTime>();
+            _activeParkings = new List<ParkingRecord>();
             _irregularities = new List<IrregularityRecord>();
         }
 
