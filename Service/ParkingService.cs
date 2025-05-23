@@ -16,30 +16,24 @@ namespace ProgettoApi.Service
 
         public EntryResponse Entry(InputDati input)
         {
-            var ticketId = Guid.NewGuid();
 
             _activeParkings.Add(new ParkingRecord
             {
-                TicketId = ticketId,
+                TicketId = input.TicketId,
                 Plate = input.Plate,
                 EntryTime = input.Data
             });
 
             return new EntryResponse
             {
-                TicketId = ticketId,
+                TicketId = input.TicketId,
                 Messaggio = $"{input.Plate} è entrato nel parcheggio alle {input.Data}."
             };
         }
 
         public string Exit(InputDati input)
         {
-            if (!input.TicketId.HasValue)
-            {
-                return "Ticket ID mancante.";
-            }
-
-            var record = _activeParkings.FirstOrDefault(r => r.TicketId == input.TicketId.Value);
+            var record = _activeParkings.FirstOrDefault(r => r.TicketId == input.TicketId);
 
             if (record == null)
             {
@@ -72,7 +66,6 @@ namespace ProgettoApi.Service
                 _irregularities.Add(new IrregularityRecord
                 {
                     Plate = plate,
-                    Date = today,
                     Count = 1
                 });
             }
