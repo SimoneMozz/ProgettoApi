@@ -4,8 +4,8 @@ namespace ProgettoApi.Service
 {
     public class ParkingService : IParkingService
     {
-        private Dictionary<string, DateTime> _activeParkings;
-        private List<IrregularityRecord> _irregularities;
+        private readonly List<ParkingRecord> _activeParkings;
+        private readonly List<IrregularityRecord> _irregularities;
 
         public void Start()
         {
@@ -13,31 +13,42 @@ namespace ProgettoApi.Service
             _irregularities = new List<IrregularityRecord>();
         }
 
-        public string Entry(InputDati input)
+        public EntryResponse Entry(InputDati input)
         {
-            _activeParkings[input.Plate] = input.Data;
-            return $"{input.Plate} è entrato nel parcheggio alle {input.Data}.";
+
+            _activeParkings.Add(new ParkingRecord
+            {
+                TicketId = input.TicketId,
+                Plate = input.Plate,
+                EntryTime = input.Data
+            });
+
+            return new EntryResponse
+            {
+                TicketId = input.TicketId,
+                Messaggio = $"{input.Plate} è entrato nel parcheggio alle {input.Data}."
+            };
         }
 
         public string Exit(InputDati input)
         {
-            if (!_activeParkings.ContainsKey(input.Plate))
+            var record = _activeParkings.FirstOrDefault(r => r.TicketId == input.TicketId);
+
+            if (record == null)
             {
-                return $"{input.Plate} non risulta parcheggiato.";
+                return $"Nessun parcheggio attivo con Ticket ID: {input.TicketId}.";
             }
 
-            DateTime entryTime = _activeParkings[input.Plate];
-            _activeParkings.Remove(input.Plate);
-
-            TimeSpan duration = input.Data - entryTime;
+            TimeSpan duration = input.Data - record.EntryTime;
+            _activeParkings.Remove(record);
 
             if (duration.TotalHours > 2)
             {
-                RecordIrregularity(input.Plate);
-                return $"{input.Plate} ha lasciato il parcheggio con un'irregolarità. Tempo totale: {duration.TotalMinutes} minuti.";
+                RecordIrregularity(record.Plate);
+                return $"{record.Plate} ha lasciato il parcheggio con un'irregolarità. Tempo totale: {duration.TotalMinutes} minuti.";
             }
 
-            return $"{input.Plate} ha lasciato il parcheggio.";
+            return $"{record.Plate} ha lasciato il parcheggio senza irregolarità.";
         }
 
         private void RecordIrregularity(string plate)
@@ -50,7 +61,11 @@ namespace ProgettoApi.Service
             }
             else
             {
-                _irregularities.Add(new IrregularityRecord { Plate = plate, Date = today, Count = 1 });
+                _irregularities.Add(new IrregularityRecord
+                {
+                    Plate = plate,
+                    Count = 1
+                });
             }
         }
         public List<IrregularityRecord> ShowIrregularities()
@@ -60,7 +75,7 @@ namespace ProgettoApi.Service
 
         public int Count()
         {
-            throw new NotImplementedException();
+            return _activeParkings.Count;
         }
 
         void IParkingService.RecordIrregularity(string plate)
@@ -68,4 +83,5 @@ namespace ProgettoApi.Service
             RecordIrregularity(plate);
         }
     }
+
 }

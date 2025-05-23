@@ -8,14 +8,18 @@ namespace ProgettoApi.Controllers
     [Route("parking")]
     public class ParkingController : ControllerBase
     {
-        //ciao ciccio prova
-        private readonly ParkingService _service = new ParkingService();
+        private readonly IParkingService _service;
+
+        public ParkingController(IParkingService parkingService)
+        {
+            _service = parkingService;
+        }
 
         [HttpPost("in")]
         public IActionResult Ingresso([FromBody] InputDati input)
         {
             var result = _service.Entry(input);
-            return Ok(result);
+            return Ok(result); // Restituisce TicketId e messaggio
         }
 
         [HttpPost("out")]
@@ -29,9 +33,9 @@ namespace ProgettoApi.Controllers
         public IActionResult GetIrregolari()
         {
             var result = _service.ShowIrregularities();
-            int totalIrregularities = result.Count; 
+            int totalIrregularities = result.Count;
             return Ok(new { TotaleIrregolarità = totalIrregularities, Dettagli = result });
         }
-
     }
+
 }
