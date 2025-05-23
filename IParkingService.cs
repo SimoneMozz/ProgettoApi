@@ -4,10 +4,11 @@ namespace ProgettoApi
 {
     public interface IParkingService
     {
-        public string Exit(InputDati input);
-        public string Entry(InputDati input);
-        public int Count();
-        public void RecordIrregularity(string plate);
-        public List<IrregularityRecord> ShowIrregularities();
+        EntryResponse Entry(InputDati input);
+        string Exit(InputDati input);
+        void RecordIrregularity(string plate);
+        List<IrregularityRecord> ShowIrregularities();
+        int Count();
     }
+
 }
