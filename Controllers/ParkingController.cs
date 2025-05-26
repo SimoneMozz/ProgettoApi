@@ -10,16 +10,16 @@ namespace ProgettoApi.Controllers
     {
         private readonly IParkingService _service;
 
-        public ParkingController(IParkingService parkingService)
+        public ParkingController(IParkingService service)
         {
-            _service = parkingService;
+            _service = service;
         }
 
         [HttpPost("in")]
         public IActionResult Ingresso([FromBody] InputDati input)
         {
             var result = _service.Entry(input);
-            return Ok(result); // Restituisce TicketId e messaggio
+            return Ok(result);
         }
 
         [HttpPost("out")]
@@ -29,13 +29,14 @@ namespace ProgettoApi.Controllers
             return Ok(result);
         }
 
-        [HttpGet("irregolari")]//ads
+        [HttpGet("irregolari")]
         public IActionResult GetIrregolari()
         {
-            var result = _service.ShowIrregularities();
-            int totalIrregularities = result.Count;
-            return Ok(new { TotaleIrregolarità = totalIrregularities, Dettagli = result });
+            var result = _service.GetAllInfractions();
+            int total = result?.Count ?? 0;
+            return Ok(new { TotaleIrregolarità = total, Dettagli = result });
         }
     }
-
 }
+
+

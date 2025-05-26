@@ -4,57 +4,90 @@ namespace ProgettoApi.Service
 {
     public class ParkingService : IParkingService
     {
-        private List<ParkingRecord> _activeParkings;
-        private List<IrregularityRecord> _irregularities;
-
-        public void Start()
-        {
-            _activeParkings = new List<ParkingRecord>();
-            _irregularities = new List<IrregularityRecord>();
-        }
+        private readonly List<ParkingRecord> _activeParkings = new();
+        private readonly List<IrregularityRecord> _irregularities = new();
 
         public EntryResponse Entry(InputDati input)
         {
-
-            _activeParkings.Add(new ParkingRecord
+            try
             {
-                TicketId = input.TicketId,
-                Plate = input.Plate,
-                EntryTime = input.Data
-            });
+                if (string.IsNullOrWhiteSpace(input.Plate))
+                    return new EntryResponse { TicketId = Guid.Empty, Messaggio = "Targa non valida." };
 
-            return new EntryResponse
+                if (input.TicketId == Guid.Empty)
+                    return new EntryResponse { TicketId = Guid.Empty, Messaggio = "TicketId non valido." };
+
+                if (_activeParkings.Any(r => r.TicketId == input.TicketId))
+                    return new EntryResponse { TicketId = input.TicketId, Messaggio = "Ticket già presente." };
+
+                if (_activeParkings.Any(r => r.Plate == input.Plate))
+                    return new EntryResponse { TicketId = input.TicketId, Messaggio = "Questa targa è già nel parcheggio." };
+
+                _activeParkings.Add(new ParkingRecord
+                {
+                    TicketId = input.TicketId,
+                    Plate = input.Plate,
+                    EntryTime = input.Data
+                });
+
+                return new EntryResponse
+                {
+                    TicketId = input.TicketId,
+                    Messaggio = $"{input.Plate} è entrata nel parcheggio alle {input.Data}."
+                };
+            }
+            catch (Exception ex)
             {
-                TicketId = input.TicketId,
-                Messaggio = $"{input.Plate} è entrato nel parcheggio alle {input.Data}."
-            };
+                return new EntryResponse { TicketId = Guid.Empty, Messaggio = $"Errore: {ex.Message}" };
+            }
         }
 
         public string Exit(InputDati input)
         {
-            var record = _activeParkings.FirstOrDefault(r => r.TicketId == input.TicketId);
-
-            if (record == null)
+            try
             {
-                return $"Nessun parcheggio attivo con Ticket ID: {input.TicketId}.";
+                if (input.TicketId == Guid.Empty)
+                    return "TicketId non valido.";
+
+                var record = _activeParkings.FirstOrDefault(r => r.TicketId == input.TicketId);
+
+                if (record == null)
+                    return "Nessuna auto trovata con questo TicketId.";
+
+                if (input.Data < record.EntryTime)
+                {
+                    return "Uscita non consentita: è stata inserita una data precedente a quella di ingresso. Il mezzo non può uscire.";
+                }
+
+                TimeSpan duration = input.Data - record.EntryTime;
+                _activeParkings.Remove(record);
+
+                if (duration.TotalHours > 2)
+                {
+                    RecordIrregularity(record.Plate);
+                    return $"{record.Plate} ha superato il tempo consentito ({duration.TotalMinutes} min). Infrazione registrata.";
+                }
+
+                return $"{record.Plate} ha lasciato il parcheggio senza infrazioni.";
             }
-
-            TimeSpan duration = input.Data - record.EntryTime;
-            _activeParkings.Remove(record);
-
-            if (duration.TotalHours > 2)
+            catch (Exception ex)
             {
-                RecordIrregularity(record.Plate);
-                return $"{record.Plate} ha lasciato il parcheggio con un'irregolarità. Tempo totale: {duration.TotalMinutes} minuti.";
+                return $"Errore durante l'uscita: {ex.Message}";
             }
+        }
 
-            return $"{record.Plate} ha lasciato il parcheggio senza irregolarità.";
+
+
+        public List<IrregularityRecord> GetAllInfractions()
+        {
+            return _irregularities;
         }
 
         private void RecordIrregularity(string plate)
         {
-            DateTime today = DateTime.Today;
+            var today = DateTime.Today;
             var record = _irregularities.FirstOrDefault(r => r.Plate == plate && r.Date.Date == today);
+
             if (record != null)
             {
                 record.Count++;
@@ -64,24 +97,10 @@ namespace ProgettoApi.Service
                 _irregularities.Add(new IrregularityRecord
                 {
                     Plate = plate,
+                    Date = today,
                     Count = 1
                 });
             }
         }
-        public List<IrregularityRecord> ShowIrregularities()
-        {
-            return _irregularities;
-        }
-
-        public int Count()
-        {
-            return _activeParkings.Count;
-        }
-
-        void IParkingService.RecordIrregularity(string plate)
-        {
-            RecordIrregularity(plate);
-        }
     }
-
 }
