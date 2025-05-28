@@ -4,7 +4,7 @@ namespace ProgettoApi.Service
 {
     public class ParkingService : IParkingService
     {
-        private readonly List<ParkingRecord> _activeParkings = new();
+        public List<ParkingRecord> _activeParkings = new();
         private readonly List<IrregularityRecord> _irregularities = new();
 
         public EntryResponse Entry(InputDati input)
@@ -75,8 +75,6 @@ namespace ProgettoApi.Service
                 return $"Errore durante l'uscita: {ex.Message}";
             }
         }
-
-
 
         public List<IrregularityRecord> GetAllInfractions()
         {
