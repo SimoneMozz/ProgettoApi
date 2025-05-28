@@ -6,9 +6,6 @@ namespace ProgettoApi
     {
         EntryResponse Entry(InputDati input);
         string Exit(InputDati input);
-        void RecordIrregularity(string plate);
-        List<IrregularityRecord> ShowIrregularities();
-        int Count();
+        List<IrregularityRecord> GetAllInfractions();
     }
-
 }
