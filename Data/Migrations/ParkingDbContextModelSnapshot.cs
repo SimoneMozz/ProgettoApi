@@ -10,7 +10,7 @@ using ProgettoApi.models;
 
 namespace ProgettoApi.Data.Migrations
 {
-    [DbContext(typeof(ParkingDbContext))]
+    [DbContext(typeof(ParkingsDbContext))]
     partial class ParkingDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

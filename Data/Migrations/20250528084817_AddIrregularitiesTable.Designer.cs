@@ -11,7 +11,7 @@ using ProgettoApi.models;
 
 namespace ProgettoApi.Data.Migrations
 {
-    [DbContext(typeof(ParkingDbContext))]
+    [DbContext(typeof(ParkingsDbContext))]
     [Migration("20250528084817_AddIrregularitiesTable")]
     partial class AddIrregularitiesTable
     {

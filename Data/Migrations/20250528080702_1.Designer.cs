@@ -11,7 +11,7 @@ using ProgettoApi.models;
 
 namespace ProgettoApi.Data.Migrations
 {
-    [DbContext(typeof(ParkingDbContext))]
+    [DbContext(typeof(ParkingsDbContext))]
     [Migration("20250528080702_1")]
     partial class _1
     {

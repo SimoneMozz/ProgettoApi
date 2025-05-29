@@ -14,6 +14,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ParkingDbContext>();
 
 builder.Services.AddScoped<IParkingService, ParkingService>();
+//builder.Services.AddScoped<IPersonaService, PersonaService>();
 
 var app = builder.Build();
 
