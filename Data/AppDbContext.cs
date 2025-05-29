@@ -14,7 +14,11 @@ public class ParkingDbContext : DbContext
         modelBuilder.ApplyConfiguration(new IrregularityRecordConfiguration());
     }
 
-    public DbSet<ParkingRecord> ParkingRecords { get; set; }
-    public DbSet<ParkingExit> ParkingExits { get; set; }
-    public DbSet<IrregularityRecord> Irregularities { get; set; }
+
+        public DbSet<ParkingRecord> ParkingRecords { get; set; }
+        public DbSet<ParkingExit> ParkingExits { get; set; }
+        public DbSet<IrregularityRecord> Irregularities { get; set; }
+        public DbSet<Persona> Persone { get; set; }
+        public DbSet<Targa> Targhe { get; set; }
+    }
 }

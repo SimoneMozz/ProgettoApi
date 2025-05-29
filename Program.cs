@@ -16,6 +16,7 @@ builder.Services.AddDbContext<ParkingDbContext>(options =>
 
 
 builder.Services.AddScoped<IParkingService, ParkingService>();
+//builder.Services.AddScoped<IPersonaService, PersonaService>();
 
 var app = builder.Build();
 
