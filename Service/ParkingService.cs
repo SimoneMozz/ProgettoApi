@@ -1,6 +1,5 @@
-﻿using ProgettoApi.models;
-using System;
-using System.Linq;
+﻿using ProgettoApi.Data;
+using ProgettoApi.models;
 
 namespace ProgettoApi.Service
 {
@@ -8,7 +7,7 @@ namespace ProgettoApi.Service
     {
         private readonly ParkingDbContext _context;
 
-        public ParkingService(ParkingDbContext context) // iniettato qui
+        public ParkingService(ParkingDbContext context)
         {
             _context = context;
         }
@@ -26,13 +25,11 @@ namespace ProgettoApi.Service
                 return new EntryResponse { TicketId = Guid.Empty, Messaggio = "TicketId non valido." };
             }
 
-            // Controlla se il ticket esiste già nel DB (ingresso già registrato)
             if (_context.ParkingRecords.Any(r => r.TicketId == input.TicketId))
             {
                 return new EntryResponse { TicketId = input.TicketId, Messaggio = "Ticket già presente." };
             }
 
-            // Controlla se la targa è già nel parcheggio (senza uscita)
             bool plateInParking = _context.ParkingRecords.Any(r => r.Plate == input.Plate);
             bool plateNotExited = _context.ParkingExits.Any(e => e.Plate == input.Plate && e.ExitTime == default(DateTime));
             if (plateInParking && !plateNotExited)
@@ -40,7 +37,6 @@ namespace ProgettoApi.Service
                 return new EntryResponse { TicketId = input.TicketId, Messaggio = "Questa targa è già nel parcheggio." };
             }
 
-            // Aggiunge nuovo record di ingresso
             var newRecord = new ParkingRecord
             {
                 TicketId = input.TicketId,
@@ -65,7 +61,6 @@ namespace ProgettoApi.Service
                 return "TicketId non valido.";
             }
 
-            // Cerca ingresso corrispondente al TicketId
             var parkingRecord = _context.ParkingRecords.FirstOrDefault(r => r.TicketId == input.TicketId);
             if (parkingRecord == null)
             {
@@ -78,7 +73,6 @@ namespace ProgettoApi.Service
                 return "Errore: la data di uscita è precedente alla data di ingresso.";
             }
 
-            // Registra l'uscita nel DB
             var parkingExit = new ParkingExit
             {
                 TicketId = input.TicketId,
@@ -91,7 +85,6 @@ namespace ProgettoApi.Service
             _context.ParkingRecords.Remove(parkingRecord);
             _context.SaveChanges();
 
-            // Calcola durata e controlla infrazioni
             var duration = input.Data - parkingRecord.EntryTime;
 
             if (duration.TotalHours > 2)
