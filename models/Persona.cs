@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace ProgettoApi.models
 {
-    
+    [Table("Persona")]
     public class Persona
     {
         [Key]
@@ -17,7 +17,8 @@ namespace ProgettoApi.models
         public required string Email { get; set; }
         public required string Password { get; set; }
 
-        public required ICollection<Targa> Targhe { get; set; }
+        public ICollection<Targa> Targhe { get; set; } = new List<Targa>();
+
 
     }
 }

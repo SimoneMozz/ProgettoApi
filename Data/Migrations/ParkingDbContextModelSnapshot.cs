@@ -8,9 +8,9 @@ using ProgettoApi.models;
 
 #nullable disable
 
-namespace ProgettoApi.Data.Migrations
+namespace ProgettoApi.Data.migrations
 {
-    [DbContext(typeof(ParkingsDbContext))]
+    [DbContext(typeof(ParkingDbContext))]
     partial class ParkingDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -82,6 +82,76 @@ namespace ProgettoApi.Data.Migrations
                     b.HasKey("TicketId");
 
                     b.ToTable("ParkingRecords");
+                });
+
+            modelBuilder.Entity("ProgettoApi.models.Persona", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Cognome")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DataNascita")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Persona");
+                });
+
+            modelBuilder.Entity("ProgettoApi.models.Targa", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("PersonaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Valore")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PersonaId");
+
+                    b.ToTable("Targhe");
+                });
+
+            modelBuilder.Entity("ProgettoApi.models.Targa", b =>
+                {
+                    b.HasOne("ProgettoApi.models.Persona", "Persona")
+                        .WithMany("Targhe")
+                        .HasForeignKey("PersonaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Persona");
+                });
+
+            modelBuilder.Entity("ProgettoApi.models.Persona", b =>
+                {
+                    b.Navigation("Targhe");
                 });
 #pragma warning restore 612, 618
         }

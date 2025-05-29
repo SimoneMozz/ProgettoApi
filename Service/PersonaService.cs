@@ -1,15 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProgettoApi.models;
-using ProgettoApi.Data;
-using ParkingsDbContext = ProgettoApi.Data.ParkingsDbContext;
 
 namespace ProgettoApi.Service
 {
     public class PersonaService : IPersonaService
     {
-        private readonly ParkingsDbContext _context;
+        private readonly ParkingDbContext _context;
 
-        public PersonaService(ParkingsDbContext context)
+        public PersonaService(ParkingDbContext context)
         {
             _context = context;
         }
